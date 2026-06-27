@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutrient Core MealKit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 font-sans">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-slate-200 py-6 px-4 md:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="leaf" class="text-green-600 w-8 h-8"></i>
+          Nutrient Core MealKit
+        </h1>
+        <p class="text-slate-500 mt-1">Gluten-Free &bull; High Protein &bull; SMASH Focused</p>
+      </div>
+      <div class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+        <i data-lucide="calendar" class="w-5 h-5 text-green-600"></i>
+        <span class="text-green-800 font-medium">Week of June 22, 2026</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto py-8 px-4 md:px-8">
+    
+    <!-- Weekly Overview Table -->
+    <section class="mb-8 w-full">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">Weekly Overview</h2>
+      <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-slate-200">
+        <table class="w-full text-left border-collapse min-w-[800px]">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="p-4 font-semibold text-slate-700 w-48">Day</th>
+              <th class="p-4 font-semibold text-slate-700 w-1/4">Breakfast</th>
+              <th class="p-4 font-semibold text-slate-700 w-1/4">Lunch</th>
+              <th class="p-4 font-semibold text-slate-700 w-1/4">Dinner</th>
+            </tr>
+          </thead>
+          <tbody id="overview-tbody" class="divide-y divide-slate-100">
+            <!-- Table rows populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="flex flex-col md:flex-row gap-8">
+      
+      <!-- Sidebar / Day Selector -->
+      <aside class="md:w-1/3 lg:w-1/4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-8">
+          <div class="p-4 bg-slate-900 text-white">
+            <h2 class="font-semibold text-lg">Daily Detail</h2>
+          </div>
+          <ul id="sidebar-list" class="divide-y divide-slate-100">
+            <!-- Sidebar items populated by JS -->
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Meal Details Area -->
+      <section class="md:w-2/3 lg:w-3/4">
+        <div class="mb-6">
+          <h2 id="detail-day-title" class="text-2xl font-bold text-slate-900"></h2>
+          <p id="detail-date-subtitle" class="text-slate-500"></p>
+        </div>
+
+        <div id="meal-details-container" class="space-y-8">
+          <!-- Meal cards populated by JS -->
+        </div>
+
+        <!-- Daily Grocery List Area -->
+        <div id="daily-grocery-list-container" class="mt-8">
+           <!-- Grocery list populated by JS -->
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // --- DATA: 7-Day Meal Plan (June 22 - June 28, 2026) ---
+    const mealPlan = [
+      {
+        day: "Monday",
+        date: "June 22, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "Protein Berry Power Bowl",
+            description: "Thick Greek yogurt intensely fortified with pea protein powder, topped with fresh blackberries and crunchy almonds.",
+            tags: ["High Protein", "Superfoods"],
+            icon: "leaf",
+            ingredients: [
+              "1 cup Greek yogurt",
+              "1 scoop Pea protein powder",
+              "1/2 cup Blackberries",
+              "1 tbsp Chia seeds",
+              "1 tbsp Almonds (crushed)"
+            ],
+            directions: [
+              "Vigorously whisk the pea protein powder into the Greek yogurt until completely smooth.",
+              "Transfer to a serving bowl.",
+              "Top evenly with blackberries, chia seeds, and crushed almonds."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Sardine & Fennel Salad",
+            description: "A bright, crunchy Mediterranean salad featuring sardines, shaved fennel bulb, and olives in a lemon vinaigrette.",
+            tags: ["SMASH Fish", "High Fiber"],
+            icon: "fish",
+            ingredients: [
+              "1 tin Sardines",
+              "1/2 cup Fennel bulb (shaved)",
+              "1/2 cup Cucumber (diced)",
+              "2 tbsp Olives (pitted)",
+              "1 tbsp Lemon juice",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Toss the shaved fennel bulb, diced cucumber, and olives in a bowl.",
+              "Flake the sardines gently over the vegetables.",
+              "Whisk the lemon juice and olive oil together and drizzle over the salad."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Pan-Seared Mahi Mahi",
+            description: "Mahi Mahi fillets pan-seared to flaky perfection with artichokes and briny capers.",
+            tags: ["Seafood", "Mediterranean"],
+            icon: "fish",
+            ingredients: [
+              "6 oz Mahi Mahi fillet",
+              "1/4 cup Artichoke hearts (chopped)",
+              "1 tbsp Capers",
+              "1 tbsp Lemon juice",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Heat olive oil in a skillet over medium-high heat.",
+              "Pan-sear the Mahi Mahi for 4-5 minutes per side until cooked through.",
+              "In the same pan, briefly sauté the artichoke hearts and capers.",
+              "Serve the fish topped with the artichoke mixture and a squeeze of fresh lemon juice."
+            ]
+          }
+        ]
+      },
+      {
+        day: "Tuesday",
+        date: "June 23, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "High-Protein Savory Millet",
+            description: "A warm, satisfying bowl of cooked millet packed with two fried eggs, fresh spinach, and nutritional yeast.",
+            tags: ["High Protein", "Vegetarian"],
+            icon: "leaf",
+            ingredients: [
+              "1/2 cup Millet (cooked)",
+              "2 Eggs",
+              "1 cup Spinach",
+              "1 tbsp Nutritional yeast",
+              "1 tsp Olive oil"
+            ],
+            directions: [
+              "Warm the cooked millet and transfer to a serving bowl.",
+              "Heat olive oil in a skillet. Quickly wilt the spinach and push to one side.",
+              "Fry the two eggs in the skillet to your preferred doneness.",
+              "Top the millet with the spinach, fried eggs, and a generous sprinkle of nutritional yeast."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Anchovy & Roasted Pepper Salad",
+            description: "A bold salad of peppery arugula, roasted bell peppers, and umami-packed anchovy fillets.",
+            tags: ["SMASH Fish", "Light Meal"],
+            icon: "fish",
+            ingredients: [
+              "1 tin Anchovies",
+              "2 cups Arugula",
+              "1/2 cup Bell pepper (roasted and sliced)",
+              "1 tbsp Balsamic vinegar",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Place the arugula in a wide salad bowl.",
+              "Arrange the sliced roasted bell peppers and anchovy fillets on top.",
+              "Drizzle the olive oil and balsamic vinegar evenly over the salad."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Persian Chicken Sabzi",
+            description: "A vibrant herb stew packed with chicken breast, kidney beans, parsley, and cilantro, served over brown rice.",
+            tags: ["Persian Influence", "High Protein"],
+            icon: "utensils",
+            ingredients: [
+              "6 oz Chicken breast (cubed)",
+              "1/4 cup Kidney beans (cooked)",
+              "1 cup Parsley (chopped)",
+              "1/2 cup Cilantro (chopped)",
+              "1/2 cup Brown rice (cooked)",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Sauté the cubed chicken in olive oil over medium heat until browned.",
+              "Add the parsley and cilantro, cooking until deeply wilted and fragrant.",
+              "Stir in the cooked kidney beans and a splash of water, simmering on low for 15 minutes.",
+              "Serve the hot herb stew over cooked brown rice."
+            ]
+          }
+        ]
+      },
+      {
+        day: "Wednesday",
+        date: "June 24, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "Pea Protein & Matcha Smoothie",
+            description: "An antioxidant powerhouse blending pea protein, oat milk, spinach, earthy matcha, and flax seeds.",
+            tags: ["High Protein", "Superfoods"],
+            icon: "leaf",
+            ingredients: [
+              "1.5 scoops Pea protein powder",
+              "1 cup Oat milk",
+              "1 cup Spinach",
+              "1 tsp Matcha powder",
+              "1 tbsp Flax seeds",
+              "1/2 cup Blueberries"
+            ],
+            directions: [
+              "Add the oat milk, spinach, blueberries, matcha powder, flax seeds, and pea protein to a blender.",
+              "Blend on high for 45-60 seconds until completely smooth.",
+              "Pour into a tall glass and drink immediately."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Herring & Black Bean Bowl",
+            description: "Rich herring paired with fiber-heavy black beans, sweet corn, and fresh cilantro.",
+            tags: ["SMASH Fish", "High Fiber"],
+            icon: "fish",
+            ingredients: [
+              "1 tin Herring",
+              "1/2 cup Black beans (rinsed)",
+              "1/4 cup Corn",
+              "2 tbsp Cilantro (chopped)",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "In a bowl, combine the black beans and corn.",
+              "Drain the herring and gently flake it over the beans.",
+              "Drizzle with olive oil and top with fresh chopped cilantro.",
+              "Toss lightly before eating."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Baked Salmon & Asparagus",
+            description: "Hearty salmon fillet baked with fresh dill and lemon, served alongside tender roasted asparagus spears.",
+            tags: ["SMASH Fish", "Healthy Fats"],
+            icon: "fish",
+            ingredients: [
+              "6 oz Salmon fillet",
+              "1 cup Asparagus (trimmed)",
+              "1 tbsp Fresh dill",
+              "1 tbsp Lemon juice",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Preheat the oven to 400°F (200°C).",
+              "Place the salmon on a baking sheet and surround with asparagus spears.",
+              "Sprinkle the salmon with dill, and drizzle the fish and vegetables with olive oil and lemon juice.",
+              "Bake for 12-15 minutes until the salmon is cooked to your preference."
+            ]
+          }
+        ]
+      },
+      {
+        day: "Thursday",
+        date: "June 25, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "Paneer & Kale Scramble",
+            description: "A highly protein-forward breakfast skillet of kale and leeks loaded with three scrambled eggs and cubes of paneer cheese.",
+            tags: ["High Protein", "Vegetarian"],
+            icon: "leaf",
+            ingredients: [
+              "3 Eggs",
+              "3 oz Paneer (cubed)",
+              "1 cup Kale (chopped)",
+              "1/4 cup Leeks (sliced)",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Heat olive oil in a skillet. Sauté the leeks until softened.",
+              "Add the kale and paneer cubes, cooking until the greens are wilted.",
+              "Whisk the three eggs, pour them into the skillet, and scramble everything together until the eggs are set."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Crab & Jicama Boats",
+            description: "Crisp endive leaves acting as crunchy boats for sweet crab meat, jicama, and celery.",
+            tags: ["Seafood", "Light Meal"],
+            icon: "fish",
+            ingredients: [
+              "4 oz Fresh crab meat",
+              "1/2 cup Jicama (diced)",
+              "1/4 cup Celery (diced)",
+              "1 tbsp Lemon juice",
+              "6 Endive leaves"
+            ],
+            directions: [
+              "Separate and wash the endive leaves, drying them thoroughly.",
+              "In a bowl, mix the diced jicama, celery, crab meat, and lemon juice.",
+              "Spoon the crab mixture evenly into the endive boats."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Lean Beef Khoresh Bademjan",
+            description: "Slow-simmered lean beef and meltingly tender eggplant in a savory beef bone broth infused with cinnamon.",
+            tags: ["Red Meat (1/2)", "Persian Influence"],
+            icon: "beef",
+            ingredients: [
+              "6 oz Lean beef (stew meat)",
+              "1 cup Eggplant (cubed)",
+              "1/2 cup Beef bone broth",
+              "1/2 tsp Cinnamon",
+              "1 cup Cauliflower (florets)",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Brown the lean beef in a pot with olive oil over medium-high heat.",
+              "Add the cubed eggplant and cinnamon, stirring for 2 minutes.",
+              "Pour in the beef bone broth, cover, and reduce heat to low.",
+              "Simmer gently for 40 minutes until tender. Steam the cauliflower florets and serve alongside."
+            ]
+          }
+        ]
+      },
+      {
+        day: "Friday",
+        date: "June 26, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "High-Protein Acai Bowl",
+            description: "A thick, icy blend of acai puree fortified with pea protein and Greek yogurt, topped with kiwi and macadamia nuts.",
+            tags: ["High Protein", "Superfoods"],
+            icon: "leaf",
+            ingredients: [
+              "1/2 cup Acai puree (unsweetened)",
+              "1/2 cup Greek yogurt",
+              "1 scoop Pea protein powder",
+              "1/2 Kiwi (sliced)",
+              "1 tbsp Macadamia nuts"
+            ],
+            directions: [
+              "In a bowl, blend or vigorously whisk the acai puree, Greek yogurt, and pea protein powder until smooth.",
+              "Smooth the top with a spoon.",
+              "Arrange the sliced kiwi on top and garnish with macadamia nuts."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Mackerel & Chickpea Salad",
+            description: "A satisfying, protein-heavy salad of mackerel and chickpeas, accented with celery and an apple cider vinaigrette.",
+            tags: ["SMASH Fish", "High Fiber"],
+            icon: "fish",
+            ingredients: [
+              "1 tin Mackerel",
+              "1/2 cup Chickpeas (rinsed)",
+              "1/4 cup Celery (diced)",
+              "1 tbsp Apple cider vinegar",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "In a bowl, combine the chickpeas and diced celery.",
+              "Flake the mackerel into the bowl.",
+              "Whisk together the olive oil and apple cider vinegar.",
+              "Pour the dressing over the salad and toss well."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Baked Cod & Roasted Roots",
+            description: "Cod baked to a buttery texture, served with roasted sweet potatoes and carrots spiced with oregano.",
+            tags: ["Seafood", "Healthy Fats"],
+            icon: "fish",
+            ingredients: [
+              "6 oz Cod fillet",
+              "1/2 cup Sweet potato (cubed)",
+              "1/2 cup Carrots (sliced)",
+              "1 tsp Oregano",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Preheat the oven to 400°F (200°C).",
+              "Toss the cubed sweet potatoes and sliced carrots with half the olive oil and oregano. Roast on a baking sheet for 15 minutes.",
+              "Place the cod in the pan, rub with the remaining olive oil, and bake alongside the veggies for an additional 12-15 minutes."
+            ]
+          }
+        ]
+      },
+      {
+        day: "Saturday",
+        date: "June 27, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "Kefir & Buckwheat Power Bowl",
+            description: "Nutty buckwheat groats and pea protein powder mixed with probiotic kefir, topped with peaches and hazelnuts.",
+            tags: ["High Protein", "Probiotic"],
+            icon: "leaf",
+            ingredients: [
+              "1/2 cup Buckwheat groats (cooked)",
+              "3/4 cup Kefir",
+              "1 scoop Pea protein powder",
+              "1/2 Peach (sliced)",
+              "1 tbsp Hazelnuts (crushed)"
+            ],
+            directions: [
+              "In a serving bowl, briskly whisk the pea protein powder into the kefir until smooth.",
+              "Stir in the cooked buckwheat groats.",
+              "Top with sliced peaches and crushed hazelnuts."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Lemon Dill Trout Flakes",
+            description: "Flaked trout served over a bed of crisp mixed lettuce with cucumbers, dressed simply with olive oil and dill.",
+            tags: ["Seafood", "Low Carb"],
+            icon: "fish",
+            ingredients: [
+              "4 oz Trout (cooked and flaked)",
+              "2 cups Lettuce (mixed greens)",
+              "1/2 cup Cucumber (sliced)",
+              "1 tbsp Fresh dill",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Place the lettuce and sliced cucumber in a serving bowl.",
+              "Top with the flaked trout.",
+              "Drizzle with olive oil and sprinkle generously with fresh dill."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Sous Vide Buffalo Steak & Chayote Squash",
+            description: "A lean buffalo steak cooked low and slow for tenderness, paired with tender sautéed chayote squash.",
+            tags: ["Red Meat (2/2)", "High Protein", "Sous Vide"],
+            icon: "beef",
+            ingredients: [
+              "6 oz Buffalo meat (steak)",
+              "1 cup Chayote squash (julienned)",
+              "2 tbsp Onion (diced)",
+              "1 clove Garlic (minced)",
+              "1/2 tsp Allspice",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Preheat the sous vide water bath to 130°F (54°C).",
+              "Rub the buffalo steak with allspice and minced garlic. Seal it in a bag with half the olive oil.",
+              "Cook in the water bath for 2 hours.",
+              "Remove the buffalo and give it a quick sear on a hot pan. In the same pan, sauté the diced onion and julienned chayote squash until tender-crisp. Serve the steak over the squash."
+            ]
+          }
+        ]
+      },
+      {
+        day: "Sunday",
+        date: "June 28, 2026",
+        meals: [
+          {
+            type: "Breakfast",
+            title: "High-Protein Chicken Scramble",
+            description: "A highly savory, protein-packed breakfast combining shredded chicken breast, dark collard greens, and scrambled eggs.",
+            tags: ["High Protein", "Superfoods"],
+            icon: "leaf",
+            ingredients: [
+              "2 Eggs",
+              "4 oz Chicken breast (cooked and shredded)",
+              "1 cup Collard greens (chopped)",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Heat the olive oil in a skillet over medium heat.",
+              "Add the collard greens and sauté until tender.",
+              "Stir in the shredded chicken breast to warm through.",
+              "Whisk the eggs, pour them over the mixture in the pan, and scramble until fully set."
+            ]
+          },
+          {
+            type: "Lunch",
+            title: "Oysters & Arugula Salad",
+            description: "Freshly shucked oysters served alongside a peppery arugula and cucumber salad with lemon vinaigrette.",
+            tags: ["Seafood", "Light Meal"],
+            icon: "fish",
+            ingredients: [
+              "6 Oysters (shucked)",
+              "2 cups Arugula",
+              "1/2 cup Cucumber (sliced)",
+              "1 tbsp Lemon juice",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Place the arugula and sliced cucumber into a serving bowl.",
+              "Whisk the olive oil and lemon juice, and drizzle over the salad.",
+              "Arrange the freshly shucked oysters on the side and serve."
+            ]
+          },
+          {
+            type: "Dinner",
+            title: "Roasted Halibut & Okra",
+            description: "Halibut baked to perfection, served alongside Mediterranean-style roasted okra and bell peppers spiced with oregano.",
+            tags: ["Seafood", "Superfoods"],
+            icon: "fish",
+            ingredients: [
+              "6 oz Halibut fillet",
+              "1 cup Okra (sliced)",
+              "1/2 cup Bell pepper (sliced)",
+              "1 clove Garlic (minced)",
+              "1 tsp Oregano",
+              "1 tbsp Olive oil"
+            ],
+            directions: [
+              "Preheat the oven to 400°F (200°C).",
+              "Toss the sliced okra, bell peppers, and minced garlic with half the olive oil and roast on a baking sheet for 15-20 minutes.",
+              "Place the halibut in a baking dish, rub with the remaining olive oil and oregano, and bake alongside the veggies for 12-15 minutes."
+            ]
+          }
+        ]
+      }
+    ];
+
+    let selectedDayIndex = 0;
+
+    function getIconColorClass(iconName) {
+      switch(iconName) {
+        case 'fish': return 'text-blue-500';
+        case 'beef': return 'text-red-500';
+        case 'leaf': return 'text-green-500';
+        default: return 'text-orange-500';
+      }
+    }
+
+    // Handles clicking a day in the sidebar or table
+    function handleDayClick(dayIndex) {
+      selectedDayIndex = dayIndex;
+      renderApp();
+    }
+
+    // Handles clicking a specific meal to scroll to it
+    function handleMealClick(event, dayIndex, mealType) {
+      event.stopPropagation();
+      selectedDayIndex = dayIndex;
+      renderApp();
+      
+      // Delay scrolling slightly to allow rendering to complete
+      setTimeout(() => {
+        const el = document.getElementById(`meal-${mealType.toLowerCase()}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('overview-tbody');
+      tbody.innerHTML = mealPlan.map((dayData, dIndex) => {
+        const isSelected = selectedDayIndex === dIndex;
+        
+        // Generate cells for Breakfast, Lunch, Dinner
+        const mealCells = ['Breakfast', 'Lunch', 'Dinner'].map(mealType => {
+          const meal = dayData.meals.find(m => m.type === mealType);
+          if (!meal) return `<td class="p-2 align-top border-r last:border-r-0 border-slate-50"></td>`;
+          
+          return `
+            <td class="p-2 align-top border-r last:border-r-0 border-slate-50">
+              <button
+                onclick="handleMealClick(event, ${dIndex}, '${meal.type}')"
+                class="w-full text-left p-2.5 rounded-lg hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all group flex flex-col gap-1.5 h-full"
+                title="${meal.title}"
+              >
+                <div class="flex items-start gap-2">
+                  <span class="shrink-0 mt-0.5">
+                    <i data-lucide="${meal.icon}" class="w-3.5 h-3.5 ${getIconColorClass(meal.icon)}"></i>
+                  </span>
+                  <span class="text-sm font-medium text-slate-700 group-hover:text-green-700 transition-colors">
+                    ${meal.title}
+                  </span>
+                </div>
+              </button>
+            </td>
+          `;
+        }).join('');
+
+        return `
+          <tr class="transition-colors hover:bg-slate-50/50 ${isSelected ? 'bg-green-50/30' : ''}">
+            <td 
+              class="p-4 cursor-pointer align-top border-r border-slate-50"
+              onclick="handleDayClick(${dIndex})"
+            >
+              <div class="font-bold ${isSelected ? 'text-green-800' : 'text-slate-800'}">
+                ${dayData.day}
+              </div>
+              <div class="text-xs text-slate-500 mt-1">${dayData.date}</div>
+            </td>
+            ${mealCells}
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderSidebar() {
+      const sidebarList = document.getElementById('sidebar-list');
+      sidebarList.innerHTML = mealPlan.map((dayData, index) => {
+        const isSelected = selectedDayIndex === index;
+        return `
+          <li>
+            <button
+              onclick="handleDayClick(${index})"
+              class="w-full text-left px-5 py-4 flex items-center justify-between transition-colors ${
+                isSelected 
+                  ? 'bg-green-50 border-l-4 border-green-500' 
+                  : 'hover:bg-slate-50 border-l-4 border-transparent'
+              }"
+            >
+              <div>
+                <div class="font-semibold ${isSelected ? 'text-green-800' : 'text-slate-700'}">
+                  ${dayData.day}
+                </div>
+                <div class="text-xs text-slate-400 mt-0.5">${dayData.date}</div>
+              </div>
+              <i data-lucide="chevron-right" class="w-5 h-5 ${isSelected ? 'text-green-500' : 'text-slate-300'}"></i>
+            </button>
+          </li>
+        `;
+      }).join('');
+    }
+
+    function renderDetails() {
+      const dayData = mealPlan[selectedDayIndex];
+      
+      document.getElementById('detail-day-title').innerText = `${dayData.day}'s Menu`;
+      document.getElementById('detail-date-subtitle').innerText = dayData.date;
+
+      const detailsContainer = document.getElementById('meal-details-container');
+      detailsContainer.innerHTML = dayData.meals.map(meal => {
+        const tagsHtml = meal.tags.map(tag => `
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+            ${tag}
+          </span>
+        `).join('');
+        
+        const ingredientsHtml = meal.ingredients.map(ing => `
+          <li class="flex items-start gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 shrink-0"></div>
+            <span>${ing}</span>
+          </li>
+        `).join('');
+        
+        const directionsHtml = meal.directions.map((dir, idx) => `
+          <li class="flex gap-3">
+            <span class="font-bold text-slate-400 shrink-0 w-4">${idx + 1}.</span>
+            <span>${dir}</span>
+          </li>
+        `).join('');
+
+        return `
+          <div 
+            id="meal-${meal.type.toLowerCase()}" 
+            class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 transition-all hover:shadow-md scroll-mt-6"
+          >
+            <!-- Meal Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 pb-5 border-b border-slate-100 gap-3">
+              <div class="flex items-center gap-3">
+                <div class="bg-slate-100 p-2.5 rounded-xl">
+                  <i data-lucide="clock" class="w-5 h-5 text-slate-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 uppercase tracking-wider">${meal.type}</h3>
+              </div>
+              
+              <!-- Tags -->
+              <div class="flex flex-wrap gap-2">
+                ${tagsHtml}
+              </div>
+            </div>
+
+            <!-- Meal Content -->
+            <div class="flex flex-col md:flex-row items-start gap-5">
+              <div class="p-4 bg-slate-50 rounded-2xl shrink-0 border border-slate-100 hidden md:block">
+                <i data-lucide="${meal.icon}" class="w-8 h-8 ${getIconColorClass(meal.icon)}"></i>
+              </div>
+              <div class="w-full">
+                <h4 class="text-2xl font-bold text-slate-900 mb-2">${meal.title}</h4>
+                <p class="text-slate-500 leading-relaxed text-sm md:text-base italic mb-6">
+                  ${meal.description}
+                </p>
+                
+                <!-- Recipe Section: Ingredients & Directions -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100">
+                  
+                  <!-- Ingredients -->
+                  <div class="md:col-span-1">
+                    <h5 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <i data-lucide="shopping-basket" class="w-4 h-4 text-green-600"></i>
+                      Ingredients
+                    </h5>
+                    <ul class="space-y-3 text-sm text-slate-700">
+                      ${ingredientsHtml}
+                    </ul>
+                  </div>
+                  
+                  <!-- Directions -->
+                  <div class="md:col-span-2">
+                    <h5 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <i data-lucide="list-ordered" class="w-4 h-4 text-orange-500"></i>
+                      Directions
+                    </h5>
+                    <ol class="space-y-4 text-sm text-slate-700">
+                      ${directionsHtml}
+                    </ol>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            <!-- Checkbox state for UI immersion -->
+            <div class="mt-8 flex justify-end">
+              <button class="flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-green-600 transition-colors">
+                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                Mark as Prepared
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderGroceryList() {
+      const dayData = mealPlan[selectedDayIndex];
+      const groceryListContainer = document.getElementById('daily-grocery-list-container');
+      
+      // Collect all ingredients for the selected day
+      let allIngredients = [];
+      dayData.meals.forEach(meal => {
+        allIngredients = allIngredients.concat(meal.ingredients);
+      });
+
+      // Simple deduplication based on exact string match. A more robust app would parse quantities.
+      const uniqueIngredients = [...new Set(allIngredients)].sort();
+      
+      const ingredientsListHtml = uniqueIngredients.map(ing => `
+          <li class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+            <input type="checkbox" class="w-4 h-4 text-green-600 rounded border-slate-300 focus:ring-green-500">
+            <span class="text-sm text-slate-700">${ing}</span>
+          </li>
+      `).join('');
+
+      groceryListContainer.innerHTML = `
+        <div class="bg-green-50/50 rounded-2xl p-6 md:p-8 shadow-sm border border-green-100">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="bg-green-100 p-2.5 rounded-xl">
+              <i data-lucide="shopping-cart" class="w-5 h-5 text-green-700"></i>
+            </div>
+            <h3 class="text-xl font-bold text-green-900">Daily Grocery List</h3>
+          </div>
+          <p class="text-sm text-green-700 mb-4">Ingredients needed for all meals on ${dayData.day}:</p>
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+            ${ingredientsListHtml}
+          </ul>
+        </div>
+      `;
+    }
+
+    function renderApp() {
+      renderTable();
+      renderSidebar();
+      renderDetails();
+      renderGroceryList(); // Render the new grocery list component
+      // Re-initialize Lucide icons for any newly rendered DOM elements
+      lucide.createIcons();
+    }
+
+    // Initialize the app on load
+    document.addEventListener("DOMContentLoaded", renderApp);
+
+  </script>
+</body>
+</html>
